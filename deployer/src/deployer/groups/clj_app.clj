@@ -1,6 +1,7 @@
 (ns deployer.groups.clj-app
   "Node definitions for a clojure app."
   (:require
+   [deployer.groups.common :refer [role-location-file]]
    [pallet.actions :refer [package package-manager package-source]]
    [pallet.api :refer [cluster-spec group-spec node-spec plan-fn] :as api]
    [pallet.crate :refer [assoc-settings defmethod-plan defplan get-settings]]
@@ -57,6 +58,7 @@
               {:settings (plan-fn (deployer.groups.clj-app/settings
                                    settings options))
                :configure (plan-fn
+                            (role-location-file)
                             (service app-kw :action :enable))}
               (into {} (mapcat service-fn [:start :stop :restart])))
      :roles #{:clojure-app app-kw})))

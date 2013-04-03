@@ -4,6 +4,7 @@
 (defproject deployer "0.1.0-SNAPSHOT"
   :description "FIXME Pallet project for deployer"
   :dependencies [[org.clojure/clojure "1.4.0"]
+                 [cheshire "5.0.2"]
                  [com.palletops/pallet ~pallet-version]
                  [com.palletops/java-crate "0.8.0-beta.2"]
                  [com.palletops/runit-crate "0.8.0-alpha.1"]
