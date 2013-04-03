@@ -2,6 +2,7 @@
   "Node defintions for deployer"
   (:require
    [deployer.groups.clj-app :as clj-app]
+   [deployer.groups.common :refer [with-config]]
    [pallet.actions :refer [package package-manager package-source]]
    [pallet.api :refer [cluster-spec group-spec server-spec node-spec plan-fn]]
    [pallet.crate.automated-admin-user :refer [automated-admin-user]]
@@ -53,10 +54,53 @@
                         :user "appuser"}))
 
 ;;; ### Groups
+(defn redis-group [config-kw]
+  (group-spec "redis"
+    :extends [base-server redis (with-config :local-dev)]))
+
+(defn postgres-group [config-kw]
+  (group-spec "pg"
+    :extends [base-server postgres (with-config :local-dev)]))
+
+(defn db-group
+  "A group with combined redis and postgres server."
+  [config-kw]
+  (group-spec "db"
+    :extends [base-server postgres redis (with-config config-kw)]))
+
+(defn simple-app-group [config-kw]
+  (group-spec "simple"
+    :extends [base-server simple-app (with-config :local-dev)]))
+
+;;; ### Composites
+
+;;; These are some example clusters - they are tagged with roles, so that
+;;; lein pallet up can be used with the --roles switch to select which
+;;; to operate on
 (def
-  ^{:doc "Defines a group spec with postgres, riak and the application."}
+  ^{:doc "Defines a group spec with postgres, riak and the application.  It uses
+  a :local-dev config (see deployer.groups.common/config)."}
   all-in-one
-  (group-spec
-   "deployer"
-   :extends [base-server postgres redis simple-app]
-   :roles #{:all-in-one}))
+  (group-spec "deployer"
+    :extends [base-server postgres redis simple-app (with-config :local-dev)]
+    :roles #{:all-in-one}))
+
+(def production-cluster
+  ^{:doc "Defines a cluster with postgres, riak and the
+  application on separate nodes.  It uses a :production config (see
+  deployer.groups.common/config)."}
+  (cluster-spec
+   "prod"
+   :groups [(redis-group :production)
+            (postgres-group :production)
+            (simple-app-group :production)]
+   :roles #{:production}))
+
+(def dev-cluster
+  ^{:doc "Defines a cluster with postgres, riak together on a single node and
+   the application on a separate node.  It uses a :dev config (see
+   deployer.groups.common/config)."}
+  (cluster-spec
+   "dev"
+   :groups [(db-group :dev) (simple-app-group :dev)]
+   :roles #{:dev}))

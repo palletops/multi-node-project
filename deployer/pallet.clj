@@ -18,4 +18,6 @@
                        :selectors #{:default :all
                                     :ubuntu :ubuntu-12 :ubuntu-12-04}}}
 
-  :groups [deployer/all-in-one])
+  :groups (concat [deployer/all-in-one]
+                  (:groups deployer/production-cluster)
+                  (:groups deployer/dev-cluster)))
