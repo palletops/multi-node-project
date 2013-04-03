@@ -36,16 +36,13 @@
    :roles #{:postgres}))
 
 (def
-  ^{:doc "Define a server spec for riak"}
-  riak
+  ^{:doc "Define a server spec for redis"}
+  redis
   (server-spec
    :phases
    {:install (plan-fn
-               (package-source "basho"
-                :aptitude {:url "http://apt.basho.com"
-                           :key-url "http://apt.basho.com/gpg/basho.apt.key"})
-               (package "riak"))}
-   :roles #{:riak}))
+               (package "redis-server"))}
+   :roles #{:redis}))
 
 ;;; ### Simple App
 (def simple-app
@@ -61,5 +58,5 @@
   all-in-one
   (group-spec
    "deployer"
-   :extends [base-server postgres riak simple-app]
+   :extends [base-server postgres redis simple-app]
    :roles #{:all-in-one}))

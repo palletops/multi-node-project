@@ -3,7 +3,7 @@
 An outline pallet project to enable the deployment of applications to multiple
 nodes.
 
-The outline project provides a minimal install of postgres and riak.
+The outline project provides a minimal install of postgres and redis.
 
 ## Cluster Configurations
 
