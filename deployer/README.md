@@ -3,13 +3,27 @@
 An outline pallet project to enable the deployment of applications to multiple
 nodes.
 
-The outline project provides a minimal install of postgres.
+The outline project provides a minimal install of postgres and riak.
 
 ## Cluster Configurations
 
-The deployment is based on a deployment descriptor file,
-`resources/clusters.clj`.  This contains a map, keyed on cluster name, that
-provides
+## Prerequisites
+
+Install [leiningen](https://github.com/technomancy/leiningen#installation).
+
+Install a ubuntu 12.04 vmfest image.
+
+```
+lein pallet add-vmfest-image https://s3.amazonaws.com/vmfest-images/ubuntu-12.04.vdi.gz
+```
+
+## Launching on Virtualbox
+
+For testing on virtualbox, there is a single node target.
+
+```
+lein pallet up --phases install,configure,start
+```
 
 ## License
 
