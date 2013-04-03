@@ -6,9 +6,7 @@
   :dependencies [[org.clojure/clojure "1.5.0"]]
 
   ;; We add a plugin that allows us to deploy an uberjar.
-  ;; There is a pull request to the canonical plugin repo for lein-package
-  ;; with the updates that are in the org.clojars.hugoduncan version.
-  :plugins [[org.clojars.hugoduncan/lein-package "0.1.1"]]
+  :plugins [[lein-package "0.1.1"]]
   :hooks [leiningen.package.hooks.deploy   ; deploy configured packages
           leiningen.package.hooks.install] ; install configured packages
 
