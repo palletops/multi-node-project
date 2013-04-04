@@ -86,6 +86,10 @@
     <appender-ref ref="VMFESTFILE" />
   </logger>
 
+  <logger name="deployer" level="DEBUG">
+    <appender-ref ref="PALLETFILE" />
+  </logger>
+
   <root level="INFO">
     <appender-ref ref="CONSOLE" />
   </root>

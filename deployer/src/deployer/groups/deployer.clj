@@ -2,7 +2,7 @@
   "Node defintions for deployer"
   (:require
    [deployer.groups.clj-app :as clj-app]
-   [deployer.groups.common :refer [with-config]]
+   [deployer.config :refer [with-config]]
    [pallet.actions :refer [package package-manager package-source]]
    [pallet.api :refer [cluster-spec group-spec server-spec node-spec plan-fn]]
    [pallet.crate.automated-admin-user :refer [automated-admin-user]]
@@ -56,21 +56,21 @@
 ;;; ### Groups
 (defn redis-group [config-kw]
   (group-spec "redis"
-    :extends [base-server redis (with-config :local-dev)]))
+    :extends [base-server (with-config :local-dev) redis]))
 
 (defn postgres-group [config-kw]
   (group-spec "pg"
-    :extends [base-server postgres (with-config :local-dev)]))
+    :extends [base-server (with-config :local-dev) postgres]))
 
 (defn db-group
   "A group with combined redis and postgres server."
   [config-kw]
   (group-spec "db"
-    :extends [base-server postgres redis (with-config config-kw)]))
+    :extends [base-server (with-config config-kw) postgres redis]))
 
 (defn simple-app-group [config-kw]
   (group-spec "simple"
-    :extends [base-server simple-app (with-config :local-dev)]))
+    :extends [base-server (with-config :local-dev) simple-app]))
 
 ;;; ### Composites
 
@@ -79,16 +79,16 @@
 ;;; to operate on
 (def
   ^{:doc "Defines a group spec with postgres, riak and the application.  It uses
-  a :local-dev config (see deployer.groups.common/config)."}
+  a :local-dev config (see deployer.config/config)."}
   all-in-one
   (group-spec "deployer"
-    :extends [base-server postgres redis simple-app (with-config :local-dev)]
+    :extends [base-server (with-config :local-dev) postgres redis simple-app]
     :roles #{:all-in-one}))
 
 (def production-cluster
   ^{:doc "Defines a cluster with postgres, riak and the
   application on separate nodes.  It uses a :production config (see
-  deployer.groups.common/config)."}
+  deployer.config/config)."}
   (cluster-spec
    "prod"
    :groups [(redis-group :production)
@@ -99,7 +99,7 @@
 (def dev-cluster
   ^{:doc "Defines a cluster with postgres, riak together on a single node and
    the application on a separate node.  It uses a :dev config (see
-   deployer.groups.common/config)."}
+   deployer.config/config)."}
   (cluster-spec
    "dev"
    :groups [(db-group :dev) (simple-app-group :dev)]

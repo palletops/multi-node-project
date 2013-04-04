@@ -1,8 +1,10 @@
 (ns deployer.groups.clj-app
   "Node definitions for a clojure app."
   (:require
+   [clojure.tools.logging :refer [debugf]]
    [deployer.groups.common :refer [role-location-file]]
-   [pallet.actions :refer [package package-manager package-source]]
+   [deployer.config :refer [resolved-artifacts]]
+   [pallet.actions :refer [package package-manager package-source remote-file]]
    [pallet.api :refer [cluster-spec group-spec node-spec plan-fn] :as api]
    [pallet.crate :refer [assoc-settings defmethod-plan defplan get-settings]]
    [pallet.crate.automated-admin-user :refer [automated-admin-user]]
@@ -24,6 +26,14 @@
   (let [settings (assoc settings :supervisor :runit)]
     (assoc-settings app-kw settings options)
     (service-supervisor-config :runit (supervisor-config-map settings) runit)))
+
+(defplan deploy
+  [app-kw]
+  (doseq [artifact (resolved-artifacts app-kw)]
+    (debugf "deploy %s : %s" app-kw (pr-str artifact))
+    (remote-file
+     (str (name app-kw) ".jar")
+     :local-file artifact)))
 
 (defplan service
   "Run an application under service management."
@@ -59,6 +69,8 @@
                                    settings options))
                :configure (plan-fn
                             (role-location-file)
-                            (service app-kw :action :enable))}
+                            (service app-kw :action :enable))
+               :deploy (plan-fn
+                         (deploy app-kw))}
               (into {} (mapcat service-fn [:start :stop :restart])))
      :roles #{:clojure-app app-kw})))
