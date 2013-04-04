@@ -19,7 +19,9 @@
    {:repositories
     {"test-repo"
      {:url "file:../target/test-repo" :snapshots true}}
-    :local-repo "file:../target/local-repo"}
+    :local-repo "file:../target/local-repo"
+    :app-root "/opt/apps"
+    :app-config "/opt/apps/config"}
    ;; For each configuration, specify the coords of the artifact to be
    ;; deployed. The key in the :deploy map should match the app-kw passed to
    ;; clj-app/server-spec.

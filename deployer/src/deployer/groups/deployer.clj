@@ -49,9 +49,7 @@
 (def simple-app
   "A server-spec for the simple app."
   (clj-app/server-spec {:app-kw :simple-app
-                        :service-name "simple-app"
-                        :run-command "java -jar simple-app.jar"
-                        :user "appuser"}))
+                        :service-name "simple-app"}))
 
 ;;; ### Groups
 (defn redis-group [config-kw]

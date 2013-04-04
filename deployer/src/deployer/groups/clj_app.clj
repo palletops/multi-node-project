@@ -1,12 +1,15 @@
 (ns deployer.groups.clj-app
   "Node definitions for a clojure app."
   (:require
+   [clojure.java.io :refer [file]]
    [clojure.tools.logging :refer [debugf]]
    [deployer.groups.common :refer [role-location-file]]
    [deployer.config :refer [resolved-artifacts]]
-   [pallet.actions :refer [package package-manager package-source remote-file]]
+   [pallet.actions :refer [directory package package-manager package-source
+                           remote-file]]
    [pallet.api :refer [cluster-spec group-spec node-spec plan-fn] :as api]
-   [pallet.crate :refer [assoc-settings defmethod-plan defplan get-settings]]
+   [pallet.crate :refer [admin-user assoc-settings defmethod-plan defplan
+                         get-settings]]
    [pallet.crate.automated-admin-user :refer [automated-admin-user]]
    [pallet.crate.java :as java]
    [pallet.crate.runit :as runit]
@@ -23,17 +26,24 @@
   "Settings for an application."
   [{:keys [app-kw runit] :as settings} {:keys [instance-id] :as options}]
   {:pre [app-kw]}
-  (let [settings (assoc settings :supervisor :runit)]
+  (let [settings (assoc settings :supervisor :runit)
+        {:keys [app-root]} (get-settings :deploy-config {})
+        settings (update-in settings [:app-path]
+                            #(or % (str app-root "/" (name app-kw) ".jar")))
+        settings (update-in settings [:run-command]
+                            #(or % (str "java -jar " (:app-path settings))))
+        settings (update-in settings [:user]
+                            #(or % (:username (admin-user))))]
     (assoc-settings app-kw settings options)
     (service-supervisor-config :runit (supervisor-config-map settings) runit)))
 
 (defplan deploy
-  [app-kw]
-  (doseq [artifact (resolved-artifacts app-kw)]
-    (debugf "deploy %s : %s" app-kw (pr-str artifact))
-    (remote-file
-     (str (name app-kw) ".jar")
-     :local-file artifact)))
+  [app-kw & {:keys [instance-id] :as options}]
+  (let [{:keys [app-path user] :as settings} (get-settings app-kw options)]
+    (doseq [artifact (resolved-artifacts app-kw)]
+      (debugf "deploy %s : %s to %s" app-kw (pr-str artifact) app-path)
+      (directory (.getParent (file app-path)) :mode "755")
+      (remote-file app-path :local-file artifact :owner user))))
 
 (defplan service
   "Run an application under service management."
