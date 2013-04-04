@@ -3,6 +3,7 @@
   (:require
    [deployer.groups.clj-app :as clj-app]
    [deployer.config :refer [with-config]]
+   [deployer.network :refer [open-to-roles]]
    [pallet.actions :refer [package package-manager package-source]]
    [pallet.api :refer [cluster-spec group-spec server-spec node-spec plan-fn]]
    [pallet.crate.automated-admin-user :refer [automated-admin-user]]
@@ -33,8 +34,13 @@
   postgres
   (server-spec
    :phases
-   {:install (plan-fn (package "postgresql"))}
+   {:install (plan-fn
+               (package "postgresql")
+               (open-to-roles #{:app :redis}))
+    :network (plan-fn
+               (open-to-roles #{:app :redis}))}
    :roles #{:postgres}))
+;; by default, postgres listens on 5432
 
 (def
   ^{:doc "Define a server spec for redis"}
@@ -42,8 +48,12 @@
   (server-spec
    :phases
    {:install (plan-fn
-               (package "redis-server"))}
+               (package "redis-server")
+               (open-to-roles #{:app}))
+    :network (plan-fn
+               (open-to-roles #{:app}))}
    :roles #{:redis}))
+;; by default, redis listens on 6379
 
 ;;; ### Simple App
 (def simple-app

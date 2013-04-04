@@ -5,7 +5,7 @@
    [pallet.actions :refer [remote-file]]
    [pallet.api :refer [plan-fn server-spec]]
    [pallet.crate :refer [defplan nodes-with-role]]
-   [pallet.node :refer [primary-ip]]))
+   [pallet.node :refer [primary-ip private-ip]]))
 
 (defn role-locations
   "Return a map with role as key, and a sequence of IP addresses as values."
@@ -13,7 +13,9 @@
      (into {}
            (map
             (fn [role]
-              [role (map (comp primary-ip :node) (nodes-with-role role))])
+              [role (map
+                     (comp #(or (private-ip %)(primary-ip %)) :node)
+                     (nodes-with-role role))])
             roles)))
   ([]
      (role-locations [:redis :postgres])))

@@ -83,4 +83,4 @@
                :deploy (plan-fn
                          (deploy app-kw))}
               (into {} (mapcat service-fn [:start :stop :restart])))
-     :roles #{:clojure-app app-kw})))
+     :roles #{:app :clojure-app app-kw})))
