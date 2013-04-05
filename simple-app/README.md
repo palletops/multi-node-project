@@ -24,6 +24,6 @@ of passwords via the `credentials.clj.pgp` file.
 
 ## License
 
-Copyright © 2013 Hugo Duncan
+Copyright © 2013 313 Ventures LLC
 
 Distributed under the Eclipse Public License.
