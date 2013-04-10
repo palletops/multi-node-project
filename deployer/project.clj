@@ -1,4 +1,4 @@
-(def pallet-version "0.8.0-SNAPSHOT")
+(def pallet-version "0.8.0-beta.7")
 (def jclouds-version "1.5.5")
 
 (defproject deployer "0.1.0-SNAPSHOT"
