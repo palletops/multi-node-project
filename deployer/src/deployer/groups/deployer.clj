@@ -64,11 +64,11 @@
 ;;; ### Groups
 (defn redis-group [config-kw]
   (group-spec "redis"
-    :extends [base-server (with-config :local-dev) redis]))
+    :extends [base-server (with-config config-kw) redis]))
 
 (defn postgres-group [config-kw]
   (group-spec "pg"
-    :extends [base-server (with-config :local-dev) postgres]))
+    :extends [base-server (with-config config-kw) postgres]))
 
 (defn db-group
   "A group with combined redis and postgres server."
@@ -78,7 +78,7 @@
 
 (defn simple-app-group [config-kw]
   (group-spec "simple"
-    :extends [base-server (with-config :local-dev) simple-app]))
+    :extends [base-server (with-config config-kw) simple-app]))
 
 ;;; ### Composites
 
